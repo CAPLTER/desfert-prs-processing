@@ -118,9 +118,7 @@ prsmod <- function(dataframe) {
 
 # sensu: newdata <- prsmod(imported)
 
-# write new data data to pg
-if (dbExistsTable(pg, c('urbancndep', 'newprs'))) dbRemoveTable(pg, c('urbancndep', 'newprs')) # make sure tbl does not exist
-dbWriteTable(pg, c('urbancndep', 'newprs'), value = newdata, row.names = F) # write temp table
+
 
 # insert into results
 dbGetQuery(pg,'
@@ -157,4 +155,69 @@ INSERT INTO urbancndep.prs_analysis
 
 # clean up
 dbRemoveTable(pg, c('urbancndep', 'newprs'))
+
+# winter 2016-2017 N-only ----
+# winter 2016-2017 PRS N data were too different to use the prsmod script. These
+# data may be too nuanced to script, maybe just follow general steps.
+# Bewildering that WesternAg output is so different with each run.
+winter_2016_2017 <- read_excel('~/Desktop/Nutrient Supply Rate Data_ Project 1720_ Sally Wittlinger.xlsx',
+                               skip = 5,
+                               col_types = c('numeric', 'text', rep('date', 2), rep('numeric', 2), 'text', rep('numeric', 3), rep('text', 14)))
+
+winter_2016_2017 <- winter_2016_2017[,c(1:10)]
+
+winter_2016_2017 <- winter_2016_2017 %>% 
+  filter(!is.na(`Sample ID`)) %>% 
+  rename(`NH4-N` = `NH4+-N`) %>% 
+  rename(`NO3-N` = `NO3--N`) %>% 
+  rename(`Total-N` = `Total N`) %>% 
+  gather(id, result, `Total-N`:`NH4-N`) %>% # stack
+  mutate(plotid = as.numeric(gsub("[[:alpha:]]", "", `Sample ID`))) %>% # extract plot id
+  mutate(location = ifelse(gsub("[[:digit:]]", "", `Sample ID`, ignore.case = T) == 'A', 'under plant',
+                           ifelse(gsub("[[:digit:]]", "", `Sample ID`, ignore.case = T) == 'B', 'between plant', NA))) %>% # location
+  mutate(location = ifelse(plotid > 75, 'BLANK', location)) %>% # location if blank
+  mutate(flag = ifelse(result <= 2.0, "below detection limit", NA)) %>% # flag bdl
+  mutate(id = gsub("\\.", "-", id)) 
+
+# write new data data to pg
+if (dbExistsTable(pg, c('urbancndep', 'newprs'))) dbRemoveTable(pg, c('urbancndep', 'newprs')) # make sure tbl does not exist
+dbWriteTable(pg, c('urbancndep', 'newprs'), value = winter_2016_2017, row.names = F) # write temp table
+
+# because dbWriteTable is creating a datetime with timezone!
+ALTER TABLE urbancndep.newprs 
+ALTER COLUMN "Burial Date" TYPE date; 
+
+ALTER TABLE urbancndep.newprs 
+ALTER COLUMN "Retrieval Date" TYPE date; 
+
+INSERT INTO urbancndep.prs_analysis
+(
+  wal_id,
+  plot_id,
+  start_date,
+  end_date,
+  analyte,
+  final_value,
+  flag,
+  location_within_plot,
+  num_cation_probes,
+  num_anion_probes,
+  notes
+)
+(
+  SELECT
+  "WAL #",
+  plotid,
+  "Burial Date",
+  "Retrieval Date",
+  id,
+  result,
+  flag,
+  location,
+  "#Cation",
+  "#Anion",
+  "Notes"
+  FROM
+  urbancndep.newprs
+);
 
