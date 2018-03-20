@@ -1,9 +1,14 @@
+
+# README
+
+
+
 # libraries ----
-library('RPostgreSQL')
-library("devtools")
-library("tidyverse")
-library("stringr")
-library("readxl")
+library(RPostgreSQL)
+library(devtools)
+library(tidyverse)
+library(stringr)
+library(readxl)
 
 
 # database connections ----
@@ -14,13 +19,16 @@ pg <- pg_prod
 pg <- pg_local
 
 
-# process full-suite data sets ----
+# FULL-SUITE DATA ----
 
-# SESSION: 2015-2016 winter deployment, read_csv removed the A \ B from the
+# SESSION: 2015-2016 winter deployment ----
+
+# read_csv removed the A \ B from the
 # Sample.ID column...weird read_excel could not handle the dates
 data <- read.csv('~/Desktop/Nutrient Supply Rate Data_ Project 1572_ Sally Wittlinger.csv', skip = 5, stringsAsFactors = F, na.strings = "NA")
 
-# SESSION: 2016 summer deployment, full-suite of ions
+# SESSION: 2016 summer deployment (full-suite) ----
+
 # did not have any problems with read_excel but used read.csv so I could use
 # the code below with minimal reworking. Had to change the date format and name
 # of cations and anions but otherwise everything below worked fine
@@ -49,9 +57,29 @@ moddat <- data %>%
 moddat <- moddat %>% mutate(result = as.numeric(result)) # had to add this for summer 2016
 
 
-# process N-only data sets ----
+# N-ONLY DATA ----
 
-# SESSION: summer 2017
+# SESSION: winter 2017-2018 ----
+
+winter_2017_2018 <- read_excel('~/Desktop/Nitrogen Supply Rate Data_ Project 1836_ Sally Wittlinger.xlsx',
+                               skip = 5)
+
+newprs <- winter_2017_2018 %>% 
+  filter(!is.na(`Sample ID`)) %>% 
+  rename(`Total-N` = `Total N`) %>% 
+  gather(id, result, `Total-N`:`NH4-N`) %>% # stack
+  mutate(
+    plotid = as.numeric(gsub("[[:alpha:]]", "", `Sample ID`)),
+    location = ifelse(gsub("[[:digit:]]", "", `Sample ID`, ignore.case = T) == 'A', 'under plant',
+                      ifelse(gsub("[[:digit:]]", "", `Sample ID`, ignore.case = T) == 'B', 'between plant', NA)), # location
+    location = ifelse(plotid > 75, 'BLANK', location), # location if blank
+    flag = ifelse(result <= 2.0, "below detection limit", NA) # flag bdl
+  ) 
+
+
+
+# SESSION: summer 2017 ----
+
 # using read.csv so as to be copasetic with the prsmod function
 data <- read.csv('~/Desktop/Nutrient Supply Rate Data_ Project 1786_ Sally Wittlinger.csv', skip = 5, stringsAsFactors = F)
 data[data == ""] <- NA
@@ -59,7 +87,8 @@ data <- data %>% filter(!is.na(Sample.ID))
 newprs <- prsmod(data)
 
 
-# SESSION: winter 2016-2017 N-only
+# SESSION: winter 2016-2017 ----
+
 # winter 2016-2017 PRS N data were too different to use the prsmod script. These
 # data may be too nuanced to script, maybe just follow general steps.
 # Bewildering that WesternAg output is so different with each run.
@@ -81,6 +110,9 @@ winter_2016_2017 <- winter_2016_2017 %>%
   mutate(location = ifelse(plotid > 75, 'BLANK', location)) %>% # location if blank
   mutate(flag = ifelse(result <= 2.0, "below detection limit", NA)) %>% # flag bdl
   mutate(id = gsub("\\.", "-", id)) 
+
+
+# generic processing function ----
 
 # WesternAg is not consistent with their output, may need to adjust this
 # function slightly to accomodate different date formats and column names note
@@ -106,6 +138,7 @@ prsmod <- function(dataframe) {
 
 # sensu: newprs <- prsmod(imported)
 
+
 # data to database ----
 
 # write new data data to pg
@@ -115,15 +148,20 @@ dbWriteTable(pg, c('urbancndep', 'newprs'), value = newprs, row.names = F) # wri
 # need to alter database fields namely because dbWriteTable creates a date field
 # with time zones. Changing the Wal ID to integer may or may not be required
 # depending on how WesternAg provides the data
+
+# note that WesternAg uses different column names almost every time so these
+# have to be updated for each run
+
 dbExecute(pg,'
   ALTER TABLE urbancndep.newprs 
-    ALTER COLUMN "Burial.Date" TYPE date, 
-    ALTER COLUMN "Retrieval.Date" TYPE date,
-    ALTER COLUMN "WAL.." TYPE integer USING ("WAL.."::integer);
+    ALTER COLUMN "Burial Date" TYPE date USING ("Burial Date"::date), 
+    ALTER COLUMN "Retrieval Date" TYPE date USING ("Retrieval Date"::date),
+    ALTER COLUMN "WAL #" TYPE integer USING ("WAL #"::integer);
 ')
 
-# insert into results - may require modification (e.g., capitalization)
-# depending on how WesternAg provides the data
+
+# note that WesternAg uses different column names almost every time so these
+# have to be updated for each run
 dbExecute(pg,'
 INSERT INTO urbancndep.prs_analysis
 (
@@ -141,16 +179,16 @@ INSERT INTO urbancndep.prs_analysis
 )
 (
   SELECT
-    "WAL..",
+    "WAL #",
     plotid,
-    "Burial.Date",
-    "Retrieval.Date",
+    "Burial Date",
+    "Retrieval Date",
     id,
     result,
     flag,
     location,
-    "X..Cation",
-    "X..Anion",
+    "# Cation",
+    "# Anion",
     "Notes"
   FROM
     urbancndep.newprs
