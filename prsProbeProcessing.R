@@ -59,6 +59,24 @@ moddat <- moddat %>% mutate(result = as.numeric(result)) # had to add this for s
 
 # N-ONLY DATA ----
 
+# SESSION: summer 2018 ----
+
+summer_2018 <- read_excel('~/Desktop/Nutrient Supply Rate Data_ Project 1897_ Sally Wittlinger.xlsx',
+                          skip = 5)
+
+newprs <- summer_2018 %>% 
+  filter(!is.na(`Sample ID`)) %>% 
+  rename(`Total-N` = `Total N`) %>% 
+  gather(id, result, `Total-N`:`NH4-N`) %>% # stack
+  mutate(
+    plotid = as.numeric(gsub("[[:alpha:]]", "", `Sample ID`)),
+    location = ifelse(gsub("[[:digit:]]", "", `Sample ID`, ignore.case = T) == 'A', 'under plant',
+                      ifelse(gsub("[[:digit:]]", "", `Sample ID`, ignore.case = T) == 'B', 'between plant', NA)), # location
+    location = ifelse(plotid > 75, 'BLANK', location), # location if blank
+    flag = ifelse(result <= 2.0, "below detection limit", NA) # flag bdl
+  ) 
+
+
 # SESSION: winter 2017-2018 ----
 
 winter_2017_2018 <- read_excel('~/Desktop/Nitrogen Supply Rate Data_ Project 1836_ Sally Wittlinger.xlsx',
