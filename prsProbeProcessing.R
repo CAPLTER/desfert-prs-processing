@@ -1,9 +1,10 @@
 
-# README
+# README -----------------------------------------------------------------------
 
 
 
-# libraries ----
+# libraries --------------------------------------------------------------------
+
 library(RPostgreSQL)
 library(devtools)
 library(tidyverse)
@@ -11,13 +12,31 @@ library(stringr)
 library(readxl)
 
 
-# database connections ----
+# database connections ---------------------------------------------------------
+
 source('~/Documents/localSettings/pg_prod.R')
 source('~/Documents/localSettings/pg_local.R')
   
 pg <- pg_prod
 pg <- pg_local
 
+
+# SESSION: winter 2019-2020 ----------------------------------------------------
+
+winter_2019_2020 <- read_excel('~/Desktop/Nutrient Supply Rate Data_Project 2007_II Sally Wittlinger.xlsx',
+  skip = 5)
+
+newprs <- winter_2019_2020 %>%
+  filter(!is.na(`Sample ID`)) %>%
+  rename(`Total-N` = `Total N`) %>%
+  gather(id, result, `Total-N`:`NH4-N`) %>% # stack
+  mutate(
+    plotid = as.numeric(gsub("[[:alpha:]]", "", `Sample ID`)),
+    location = ifelse(gsub("[[:digit:]]", "", `Sample ID`, ignore.case = T) == "A", "under plant",
+      ifelse(gsub("[[:digit:]]", "", `Sample ID`, ignore.case = T) == "B", "between plant", NA)), # location
+    location = ifelse(plotid > 75, "BLANK", location), # location if blank
+    flag = ifelse(result <= 2.0, "below detection limit", NA) # flag bdl
+  )
 
 
 # SESSION: summer 2019 ----------------------------------------------------
@@ -190,8 +209,76 @@ prsmod <- function(dataframe) {
 
 # sensu: newprs <- prsmod(imported)
 
+# data to database (CLI) -------------------------------------------------------
 
-# data to database ----
+```sh
+scp newprs.csv to server
+```
+
+```sql
+CREATE TABLE urbancndep.newprs (
+  "WAL #" text,
+  "Sample ID" text,
+  "Burial Date" text,
+  "Retrieval Date" text,
+  "# Anion" double precision,
+  "# Cation" double precision,
+  "Notes" text,
+  id text,
+  result double precision,
+  plotid double precision,
+  location text,
+  flag text
+  );
+```
+
+```sql
+ALTER TABLE urbancndep.newprs 
+  ALTER COLUMN "Burial Date" TYPE date USING ("Burial Date"::date), 
+  ALTER COLUMN "Retrieval Date" TYPE date USING ("Retrieval Date"::date),
+  ALTER COLUMN "WAL #" TYPE integer USING ("WAL #"::integer);
+```
+
+```sql
+COPY newprs
+FROM '/home/ubuntu/newprs.csv'
+DELIMITER ',' CSV HEADER;
+```
+
+```sql
+INSERT INTO urbancndep.prs_analysis
+(
+  wal_id,
+  plot_id,
+  start_date,
+  end_date,
+  analyte,
+  final_value,
+  flag,
+  location_within_plot,
+  num_cation_probes,
+  num_anion_probes,
+  notes
+)
+(
+  SELECT
+    "WAL #",
+    plotid,
+    "Burial Date",
+    "Retrieval Date",
+    id,
+    result,
+    flag,
+    location,
+    "# Cation",
+    "# Anion",
+    "Notes"
+  FROM
+    urbancndep.newprs
+);
+```
+
+# data to database (from R) ----------------------------------------------------
 
 # write new data data to pg
 if (dbExistsTable(pg, c('urbancndep', 'newprs'))) dbRemoveTable(pg, c('urbancndep', 'newprs')) # make sure tbl does not exist
