@@ -70,16 +70,12 @@ four_tenths <- c(
 ```
 
 
-# summer 2020
+# processing
 
-PRS data from summer 2020. These data include the full-suite of cation and
-anion analyses (i.e., are not limited to nitrogen species).
-
-
-```{r summer-2020, eval=TRUE}
+```{r processing, eval=TRUE}
 
 prs_upload <- read_excel(
-  path = "~/Desktop/Nutrient Supply Rate Data 2109_Sally Wittlinger.xlsx",
+  path = "~/Desktop/Nutrient Supply Rate Data 2109_Quincy Stewart.xlsx",
   skip = 5
 )
 
@@ -140,12 +136,15 @@ need to be tweaked for each run.
 
 ```{r format-table, eval=TRUE}
 
-dbExecute(pg,'
-  ALTER TABLE urbancndep.new_prs
+DBI::dbWithTransaction(pg,
+  DBI::dbExecute(pg,'
+    ALTER TABLE urbancndep.new_prs
     ALTER COLUMN "Burial Date" TYPE date USING ("Burial Date"::date),
     ALTER COLUMN "Retrieval Date" TYPE date USING ("Retrieval Date"::date),
-    ALTER COLUMN "WAL #" TYPE integer USING ("WAL #"::integer);
-')
+    ALTER COLUMN "WAL #" TYPE integer USING ("WAL #"::integer);'
+  )
+)
+
 ```
 
 ## insert data from temporary table to prs_analysis
@@ -155,37 +154,39 @@ names so the insert statment may need to be tweaked for each run.
 
 ```{r write-to-disk, eval=TRUE}
 
-dbExecute(pg,'
-INSERT INTO urbancndep.prs_analysis
-(
-  wal_id,
-  plot_id,
-  start_date,
-  end_date,
-  analyte,
-  final_value,
-  flag,
-  location_within_plot,
-  num_cation_probes,
-  num_anion_probes,
-  notes
-)
-(
-  SELECT
-    "WAL #",
-    plotid,
-    "Burial Date",
-    "Retrieval Date",
-    id,
-    result,
-    flag,
-    location,
-    "# Cation",
-    "# Anion",
-    "Notes"
-  FROM
-    urbancndep.new_prs
-);')
+DBI::dbWithTransaction(pg,
+  DBI::dbExecute(pg,'
+    INSERT INTO urbancndep.prs_analysis
+    (
+      wal_id,
+      plot_id,
+      start_date,
+      end_date,
+      analyte,
+      final_value,
+      flag,
+      location_within_plot,
+      num_cation_probes,
+      num_anion_probes,
+      notes
+    )
+    (
+      SELECT
+      "WAL #",
+      plotid,
+      "Burial Date",
+      "Retrieval Date",
+      id,
+      result,
+      flag,
+      location,
+      "# Cation",
+      "# Anion",
+      "Notes"
+      FROM
+      urbancndep.new_prs
+      );')
+  )
 
 ```
 
