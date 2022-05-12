@@ -1,4 +1,3 @@
-
 # README -----------------------------------------------------------------------
 
 Workflow for processing PRS probe data at Desert Fertilization sampling
@@ -12,67 +11,7 @@ of a previous run for new runs.
 
 ```{r config, eval=FALSE}
 
-source("config.R")
-
-```
-
-# detection limits -------------------------------------------------------------
-
-Unique analyte names when imported with read_excel() and after renaming `Total
-N` to `Total-N`:
-
-```{r analytes, eval=FALSE, echo=TRUE, message=TRUE}
-
-analytes <- c(
-  "Total-N",
-  "NO3-N",
-  "NH4-N",
-  "Ca",
-  "Mg",
-  "K",
-  "P",
-  "Fe",
-  "Mn",
-  "Cu",
-  "Zn",
-  "B",
-  "S",
-  "Pb",
-  "Al",
-  "Cd"
-)
-
-```
-
-```{r detection-limits, eval=TRUE}
-
-two <- c(
-  "Total-N",
-  "NO3-N",
-  "NH4-N",
-  "Ca",
-  "S"
-)
-
-four <- c(
-  "Mg",
-  "K"
-)
-
-two_tenths <- c(
-  "P",
-  "Mn",
-  "Cu",
-  "Zn",
-  "B",
-  "Pb",
-  "Cd"
-)
-
-four_tenths <- c(
-  "Fe",
-  "Al"
-)
+source("global.R")
 
 ```
 
@@ -81,19 +20,9 @@ four_tenths <- c(
 ```{r import, eval=TRUE}
 
 prs_upload <- readxl::read_excel(
-  path = "~/Dropbox/development/PRS/2021/Nutrient Supply Rate Data_ Project 2198_ Quincy Stewart.xlsx",
+  path = "~/Desktop/Nutrient Supply Rate Data_ Project 2198_ Quincy Stewart_6003.xlsx",
   skip = 5
 )
-
-# check for reasonable (< 180 d) deployment period
-prs_upload |>
-  pointblank::col_vals_lt(
-    columns       = vars(date_range),
-    value         = 180,
-    na_pass       = TRUE,
-    preconditions = function(x) { dplyr::mutate(x, date_range = lubridate::ymd(x$`Retrieval Date`) - lubridate::ymd(x$`Burial Date`))},
-    actions       = pointblank::stop_on_fail()
-  )
 
 ```
 
@@ -101,31 +30,7 @@ prs_upload |>
 
 ```{r processing, eval=TRUE}
 
-new_prs <- prs_upload |>
-  dplyr::filter(!is.na(`Sample ID`)) |>
-  dplyr::rename(`Total-N` = `Total N`) |>
-  tidyr::pivot_longer(
-    cols      = `Total-N`:last_col(),
-    names_to  = "id",
-    values_to = "result"
-    ) |>
-  # gather(id, result, `Total-N`:last_col()) |> # stack
-  dplyr::mutate(
-    plotid = as.numeric(gsub("[[:alpha:]]", "", `Sample ID`)),
-    location = dplyr::case_when(
-      grepl("a", `Sample ID`, ignore.case = TRUE) ~ "under plant",
-      grepl("b", `Sample ID`, ignore.case = TRUE) ~ "between plant",
-      plotid > 75 ~ "BLANK",
-      TRUE ~ NA_character_
-      ),
-    flag = dplyr::case_when(
-      result <= 2.0 & id %in% two ~ "below detection limit",
-      result <= 4.0 & id %in% four ~ "below detection limit",
-      result <= 0.2 & id %in% two_tenths ~ "below detection limit",
-      result <= 0.4 & id %in% four_tenths ~ "below detection limit",
-      TRUE ~ NA_character_
-    )
-  )
+new_prs <- format_prs_data(prs_upload)
 
 ```
 
@@ -135,15 +40,10 @@ new_prs <- prs_upload |>
 
 ```{r temporary-table-to-pg, eval=TRUE}
 
-# write new data data to a temporary table
-
-if (dbExistsTable(pg, c("urbancndep", "new_prs"))) {
-
-  dbRemoveTable(pg, c("urbancndep", "new_prs"))
-
-}
-
-dbWriteTable(pg, c("urbancndep", "new_prs"), value = new_prs, row.names = F)
+write_temp_table(
+  schema_name          = "urbancndep",
+  temporary_table_name = "new_prs"
+)
 
 ```
 
@@ -219,4 +119,3 @@ DBI::dbWithTransaction(pg,
 dbRemoveTable(pg, c("urbancndep", "new_prs"))
 
 ```
-
