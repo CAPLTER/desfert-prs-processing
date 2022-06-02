@@ -1,0 +1,56 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	//
+"helper_format_data.R"	global.R	/^source("helper_format_data.R")$/;"	s
+"helper_validate_deployment.R"	global.R	/^source("helper_validate_deployment.R")$/;"	s
+"helper_write_temp_table.R"	global.R	/^source("helper_write_temp_table.R")$/;"	s
+'~/Documents/localSettings/pg_local.R'	archive/prsProbeProcessing.R	/^source('~\/Documents\/localSettings\/pg_local.R')$/;"	s
+'~/Documents/localSettings/pg_prod.R'	archive/prsProbeProcessing.R	/^source('~\/Documents\/localSettings\/pg_prod.R')$/;"	s
+RPostgreSQL	archive/prsProbeProcessing.R	/^library(RPostgreSQL)$/;"	l
+analytes	global.R	/^analytes <- c($/;"	g
+data	archive/prsProbeProcessing.R	/^data <- data %>% filter(!is.na(Sample.ID))$/;"	g
+data	archive/prsProbeProcessing.R	/^data <- read.csv('~\/Desktop\/Nutrient Supply Rate Data_ Project 1572_ Sally Wittlinger.csv', sk/;"	g
+data	archive/prsProbeProcessing.R	/^data <- read.csv('~\/Desktop\/Nutrient Supply Rate Data_ Project 1673_ Sally Wittlinger.csv', sk/;"	g
+data	archive/prsProbeProcessing.R	/^data <- read.csv('~\/Desktop\/Nutrient Supply Rate Data_ Project 1786_ Sally Wittlinger.csv', sk/;"	g
+dataMod	archive/prsProbeProcessing.R	/^  dataMod <- dataframe %>%$/;"	v
+data[data==""]	archive/prsProbeProcessing.R	/^data[data == ""] <- NA$/;"	g
+desfert-prs-processing	README.md	/^# desfert-prs-processing$/;"	c
+devtools	archive/prsProbeProcessing.R	/^library(devtools)$/;"	l
+fall 2021	README.md	/^### fall 2021$/;"	S
+fall 2021 (should be an earlier campaign)	README.md	/^### fall 2021 (should be an earlier campaign)$/;"	S
+format_prs_data	helper_format_data.R	/^format_prs_data <- function(imported_data) {$/;"	f
+formatted_prs	helper_format_data.R	/^  formatted_prs <- imported_data |>$/;"	v
+four	global.R	/^four <- c($/;"	g
+four_tenths	global.R	/^four_tenths <- c($/;"	g
+moddat	archive/prsProbeProcessing.R	/^moddat <- data %>%$/;"	g
+moddat	archive/prsProbeProcessing.R	/^moddat <- moddat %>% mutate(result = as.numeric(result)) # had to add this for summer 2016$/;"	g
+newprs	archive/prsProbeProcessing.R	/^newprs <- prsmod(data)$/;"	g
+newprs	archive/prsProbeProcessing.R	/^newprs <- summer_2018 %>% $/;"	g
+newprs	archive/prsProbeProcessing.R	/^newprs <- summer_2019 %>% $/;"	g
+newprs	archive/prsProbeProcessing.R	/^newprs <- winter_2017_2018 %>% $/;"	g
+newprs	archive/prsProbeProcessing.R	/^newprs <- winter_2018_2019 %>% $/;"	g
+newprs	archive/prsProbeProcessing.R	/^newprs <- winter_2019_2020 %>%$/;"	g
+pg	archive/prsProbeProcessing.R	/^pg <- pg_local$/;"	g
+pg	archive/prsProbeProcessing.R	/^pg <- pg_prod$/;"	g
+processing notes	README.md	/^## processing notes$/;"	s
+prsmod	archive/prsProbeProcessing.R	/^prsmod <- function(dataframe) {$/;"	f
+readxl	archive/prsProbeProcessing.R	/^library(readxl)$/;"	l
+stringr	archive/prsProbeProcessing.R	/^library(stringr)$/;"	l
+summer 2020	README.md	/^### summer 2020$/;"	S
+summer_2018	archive/prsProbeProcessing.R	/^summer_2018 <- read_excel('~\/Desktop\/Nutrient Supply Rate Data_ Project 1897_ Sally Wittlinger/;"	g
+summer_2019	archive/prsProbeProcessing.R	/^summer_2019  <- read_excel('~\/Desktop\/Nutrient Supply Rate Data_Project 2007_ Sally Wittlinger/;"	g
+tidyverse	archive/prsProbeProcessing.R	/^library(tidyverse)$/;"	l
+two	global.R	/^two <- c($/;"	g
+two_tenths	global.R	/^two_tenths <- c($/;"	g
+validate_deployment_times	helper_validate_deployment.R	/^validate_deployment_times <- function(prs_data) {$/;"	f
+winter_2016_2017	archive/prsProbeProcessing.R	/^winter_2016_2017 <- read_excel('~\/Desktop\/Nutrient Supply Rate Data_ Project 1720_ Sally Wittl/;"	g
+winter_2016_2017	archive/prsProbeProcessing.R	/^winter_2016_2017 <- winter_2016_2017 %>% $/;"	g
+winter_2016_2017	archive/prsProbeProcessing.R	/^winter_2016_2017 <- winter_2016_2017[,c(1:10)]$/;"	g
+winter_2017_2018	archive/prsProbeProcessing.R	/^winter_2017_2018 <- read_excel('~\/Desktop\/Nitrogen Supply Rate Data_ Project 1836_ Sally Wittl/;"	g
+winter_2018_2019	archive/prsProbeProcessing.R	/^winter_2018_2019  <- read_excel('~\/Desktop\/Nutrient Supply Rate Data_ Project 1895_ Sally Witt/;"	g
+winter_2019_2020	archive/prsProbeProcessing.R	/^winter_2019_2020 <- read_excel('~\/Desktop\/Nutrient Supply Rate Data_Project 2007_II Sally Witt/;"	g
+write_temp_table	helper_write_temp_table.R	/^write_temp_table <- function(schema_name, temporary_table_name) {$/;"	f
