@@ -1,65 +1,50 @@
 # README -----------------------------------------------------------------------
 
-Workflow for processing PRS probe data at Desert Fertilization sampling
-locations. The format of data provided from WesternAg can vary just enough each
-iteration that functionalizing this workflow has not worked well, and the
-sampling is infrequent enough that it is easier to simply template the workflow
-of a previous run for new runs.
+# Workflow for processing PRS probe data at Desert Fertilization sampling
+# locations. The format of data provided from WesternAg can vary just enough each
+# iteration that functionalizing this workflow has not worked well, and the
+# sampling is infrequent enough that it is easier to simply template the workflow
+# of a previous run for new runs.
 
 
 # config -----------------------------------------------------------------------
 
-```{r config, eval=FALSE}
-
 source("global.R")
 
-```
 
-# import
-
-```{r import, eval=TRUE}
+# import -----------------------------------------------------------------------
 
 prs_upload <- readxl::read_excel(
-  path = "~/Desktop/Nutrient Supply Rate Data_ Project 2198_ Quincy Stewart_6003.xlsx",
+  path = "~/Desktop/Nutrient supply rate data project_2314_Quiincy Stewart.xlsx",
   skip = 5
 )
 
-```
 
-# processing
-
-```{r processing, eval=TRUE}
+# processing -------------------------------------------------------------------
 
 new_prs <- format_prs_data(prs_upload)
 
-```
 
 # add data to the database -----------------------------------------------------
 
 ## temporary table to postgres
-
-```{r temporary-table-to-pg, eval=TRUE}
 
 write_temp_table(
   schema_name          = "urbancndep",
   temporary_table_name = "new_prs"
 )
 
-```
-
 ## format temporary table
 
-Need to alter database fields namely because dbWriteTable creates a date field
-with time zones. Changing the Wal ID to integer may or may not be required
-depending on how WesternAg provides the data.
+# Need to alter database fields namely because dbWriteTable creates a date field
+# with time zones. Changing the Wal ID to integer may or may not be required
+# depending on how WesternAg provides the data.
 
-Note that WesternAg often uses slightly different column names so these may
-need to be tweaked for each run.
-
-```{r format-table, eval=TRUE}
+# Note that WesternAg often uses slightly different column names so these may
+# need to be tweaked for each run.
 
 DBI::dbWithTransaction(pg,
-  DBI::dbExecute(pg,'
+  DBI::dbExecute(pg, '
     ALTER TABLE urbancndep.new_prs
     ALTER COLUMN "Burial Date" TYPE date USING ("Burial Date"::date),
     ALTER COLUMN "Retrieval Date" TYPE date USING ("Retrieval Date"::date),
@@ -67,17 +52,14 @@ DBI::dbWithTransaction(pg,
   )
 )
 
-```
 
 ## insert data from temporary table to prs_analysis
 
-As with formatting (above), WesternAg often uses slightly different column
-names so the insert statement may need to be tweaked for each run.
-
-```{r write-to-disk, eval=TRUE}
+# As with formatting (above), WesternAg often uses slightly different column
+# names so the insert statement may need to be tweaked for each run.
 
 DBI::dbWithTransaction(pg,
-  DBI::dbExecute(pg,'
+  DBI::dbExecute(pg, '
     INSERT INTO urbancndep.prs_analysis
     (
       wal_id,
@@ -110,12 +92,6 @@ DBI::dbWithTransaction(pg,
       );')
   )
 
-```
-
 ## house keeping
 
-```{r housekeeping, eval=TRUE}
-
 dbRemoveTable(pg, c("urbancndep", "new_prs"))
-
-```

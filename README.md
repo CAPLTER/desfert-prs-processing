@@ -2,7 +2,15 @@
 
 This repository contains the R scripts for processing PRS probe raw data, and inserting those processed data into the DesFert database.
 
-## processing notes
+## processing notes (if relevant)
+
+### fall 2022
+
+- fixed error in data formatting step that was labeling blank values as having the location under plant (also fixed in the database errors from previous uploads)
+- moved workflow from .Rmd to .R 
+- added additional checks to ensure data integrity:
+  + ensure that all WesternAg Wal ID numbers in the input are included in the output (i.e., that data were not inappropriately filtered or otherwise excluded)
+  + location field includes only values: "under plant", "between plant", "BLANK"
 
 ### fall 2021
 

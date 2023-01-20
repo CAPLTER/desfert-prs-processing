@@ -3,6 +3,7 @@
 source("helper_write_temp_table.R")
 source("helper_validate_deployment.R")
 source("helper_format_data.R")
+source("helper_validate_wal_ids.R")
 
 
 #' @section analyte names and detection details for use in data processing
