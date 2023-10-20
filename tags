@@ -14,6 +14,7 @@
 !_TAG_KIND_DESCRIPTION!Markdown	S,subsection	/level 2 sections/
 !_TAG_KIND_DESCRIPTION!Markdown	T,l4subsection	/level 4 sections/
 !_TAG_KIND_DESCRIPTION!Markdown	c,chapter	/chapters/
+!_TAG_KIND_DESCRIPTION!Markdown	h,hashtag	/hashtags/
 !_TAG_KIND_DESCRIPTION!Markdown	n,footnote	/footnotes/
 !_TAG_KIND_DESCRIPTION!Markdown	s,section	/sections/
 !_TAG_KIND_DESCRIPTION!Markdown	t,subsubsection	/level 3 sections/
@@ -31,14 +32,14 @@
 !_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
 !_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
 !_TAG_OUTPUT_VERSION	0.0	/current.age/
-!_TAG_PARSER_VERSION!Markdown	0.0	/current.age/
+!_TAG_PARSER_VERSION!Markdown	1.1	/current.age/
 !_TAG_PARSER_VERSION!R	0.0	/current.age/
 !_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
 !_TAG_PROC_CWD	/home/srearl/localRepos/desfert-prs-processing/	//
 !_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
 !_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
 !_TAG_PROGRAM_URL	https://ctags.io/	/official site/
-!_TAG_PROGRAM_VERSION	6.0.0	/13d8e3f6/
+!_TAG_PROGRAM_VERSION	6.0.0	/d104ee5b/
 !_TAG_ROLE_DESCRIPTION!R!library	library	/library attached by library function/
 !_TAG_ROLE_DESCRIPTION!R!library	require	/library attached by require function/
 !_TAG_ROLE_DESCRIPTION!R!source	source	/source loaded by source fucntion/
@@ -58,8 +59,9 @@ data	archive/prsProbeProcessing.R	/^data <- read.csv('~\/Desktop\/Nutrient Suppl
 dataMod	archive/prsProbeProcessing.R	/^  dataMod <- dataframe %>%$/;"	v	function:prsmod
 date_range	helper_validate_deployment.R	/^      preconditions = function(x) { dplyr::mutate(x, date_range = lubridate::ymd(x$`Retrieval Da/;"	v	function:validate_deployment_times.preconditions
 desfert-prs-processing	README.md	/^# desfert-prs-processing$/;"	c
-fall 2021	README.md	/^### fall 2021$/;"	S	section:desfert-prs-processing""processing notes
-fall 2021 (should be an earlier campaign)	README.md	/^### fall 2021 (should be an earlier campaign)$/;"	S	section:desfert-prs-processing""processing notes
+fall 2021	README.md	/^### fall 2021$/;"	S	section:desfert-prs-processing""processing notes (if relevant)
+fall 2021 (should be an earlier campaign)	README.md	/^### fall 2021 (should be an earlier campaign)$/;"	S	section:desfert-prs-processing""processing notes (if relevant)
+fall 2022	README.md	/^### fall 2022$/;"	S	section:desfert-prs-processing""processing notes (if relevant)
 flag	helper_format_data.R	/^    flag = dplyr::case_when($/;"	v	function:format_prs_data
 format_prs_data	helper_format_data.R	/^format_prs_data <- function(imported_data) {$/;"	f
 formatted_prs	helper_format_data.R	/^  formatted_prs <- imported_data |>$/;"	v	function:format_prs_data
@@ -78,19 +80,19 @@ newprs	archive/prsProbeProcessing.R	/^newprs <- summer_2019 %>% $/;"	g
 newprs	archive/prsProbeProcessing.R	/^newprs <- winter_2017_2018 %>% $/;"	g
 newprs	archive/prsProbeProcessing.R	/^newprs <- winter_2018_2019 %>% $/;"	g
 newprs	archive/prsProbeProcessing.R	/^newprs <- winter_2019_2020 %>%$/;"	g
-path	prs_processing.R	/^  path = "~\/Desktop\/Nutrient supply rate data project_2314_Quiincy Stewart.xlsx",$/;"	g
+path	prs_processing.R	/^  path = "~\/Desktop\/Nutrient Supply Rate Data_ Project 2418_ Quincy Stewart.xlsx",$/;"	g
 pg	archive/prsProbeProcessing.R	/^pg <- pg_local$/;"	g
 pg	archive/prsProbeProcessing.R	/^pg <- pg_prod$/;"	g
 plotid	helper_format_data.R	/^    plotid = as.numeric(gsub("[[:alpha:]]", "", `Sample ID`)),$/;"	v	function:format_prs_data
 preconditions	helper_validate_deployment.R	/^      preconditions = function(x) { dplyr::mutate(x, date_range = lubridate::ymd(x$`Retrieval Da/;"	f	function:validate_deployment_times
-processing notes	README.md	/^## processing notes$/;"	s	chapter:desfert-prs-processing
+processing notes (if relevant)	README.md	/^## processing notes (if relevant)$/;"	s	chapter:desfert-prs-processing
 prs_upload	prs_processing.R	/^prs_upload <- readxl::read_excel($/;"	g
 prsmod	archive/prsProbeProcessing.R	/^prsmod <- function(dataframe) {$/;"	f
 row.names	archive/prsProbeProcessing.R	/^dbWriteTable(pg, c('urbancndep', 'newprs'), value = newprs, row.names = F) # write temp table$/;"	n	vector:anonVec8b84df800506
 row.names	helper_write_temp_table.R	/^    row.names = FALSE$/;"	v	function:write_temp_table
 set	helper_format_data.R	/^    set     = c("under plant", "between plant", "BLANK"),$/;"	c	function:format_prs_data
 skip	prs_processing.R	/^  skip = 5$/;"	g
-summer 2020	README.md	/^### summer 2020$/;"	S	section:desfert-prs-processing""processing notes
+summer 2020	README.md	/^### summer 2020$/;"	S	section:desfert-prs-processing""processing notes (if relevant)
 summer_2018	archive/prsProbeProcessing.R	/^summer_2018 <- read_excel('~\/Desktop\/Nutrient Supply Rate Data_ Project 1897_ Sally Wittlinger/;"	g
 summer_2019	archive/prsProbeProcessing.R	/^summer_2019  <- read_excel('~\/Desktop\/Nutrient Supply Rate Data_Project 2007_ Sally Wittlinger/;"	g
 two	global.R	/^two <- c($/;"	c

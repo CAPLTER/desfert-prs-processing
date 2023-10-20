@@ -15,7 +15,7 @@ source("global.R")
 # import -----------------------------------------------------------------------
 
 prs_upload <- readxl::read_excel(
-  path = "~/Desktop/Nutrient supply rate data project_2314_Quiincy Stewart.xlsx",
+  path = "~/Desktop/Nutrient Supply Rate Data_ Project 2418_ Quincy Stewart.xlsx",
   skip = 5
 )
 
@@ -94,4 +94,4 @@ DBI::dbWithTransaction(pg,
 
 ## house keeping
 
-dbRemoveTable(pg, c("urbancndep", "new_prs"))
+DBI::dbRemoveTable(pg, c("urbancndep", "new_prs"))
