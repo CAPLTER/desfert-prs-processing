@@ -1,10 +1,10 @@
 # README -----------------------------------------------------------------------
 
 # Workflow for processing PRS probe data at Desert Fertilization sampling
-# locations. The format of data provided from WesternAg can vary just enough each
-# iteration that functionalizing this workflow has not worked well, and the
-# sampling is infrequent enough that it is easier to simply template the workflow
-# of a previous run for new runs.
+# locations. The format of data provided from WesternAg can vary just enough
+# each iteration such that functionalizing this workflow has not worked well,
+# and the sampling is infrequent enough that it is easier to simply template the
+# workflow of a previous run for new runs.
 
 
 # config -----------------------------------------------------------------------
@@ -15,7 +15,7 @@ source("global.R")
 # import -----------------------------------------------------------------------
 
 prs_upload <- readxl::read_excel(
-  path = "~/Desktop/Nutrient Supply Rate Data_ Project 2418_ Quincy Stewart.xlsx",
+  path = "~/Desktop/Nutrient Supply Rate Data_2517_Quincy Stewart.xlsx",
   skip = 5
 )
 
