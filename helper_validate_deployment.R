@@ -1,30 +1,25 @@
 #' @title check for reasonable (< 180 d) deployment period
 #'
 #' @description `validate_deployment_times` checks to ensure that reported
-#' deployment dates are reasonable (less than 180 days; greater than 0 days).
-#' The purpose of this validation is to help identify deployment dates that may
-#' have been entered incorrectly.
+#' deployment dates are reasonable (greater than 0 and less than 180 days). The
+#' purpose of this validation is to help identify deployment dates that may have
+#' been entered incorrectly. Stops on failure.
+#'
+#' @param start_date,end_date Date vectors (burial and retrieval).
 #'
 #' @export
 
-validate_deployment_times <- function(prs_data) {
+validate_deployment_times <- function(start_date, end_date, sample_id) {
 
-  prs_data |>
-    pointblank::col_vals_lt(
-      columns       = vars(date_range),
-      value         = 180,
-      na_pass       = TRUE,
-      preconditions = function(x) { dplyr::mutate(x, date_range = lubridate::ymd(x$`Retrieval Date`) - lubridate::ymd(x$`Burial Date`))},
-      actions       = pointblank::stop_on_fail()
-    )
+  deployment_days <- as.numeric(end_date - start_date)
 
-  prs_data |>
-    pointblank::col_vals_gt(
-      columns       = vars(date_range),
-      value         = 0,
-      na_pass       = TRUE,
-      preconditions = function(x) { dplyr::mutate(x, date_range = lubridate::ymd(x$`Retrieval Date`) - lubridate::ymd(x$`Burial Date`))},
-      actions       = pointblank::stop_on_fail()
+  bad <- !is.na(deployment_days) & (deployment_days <= 0 | deployment_days >= 180)
+
+  if (any(bad)) {
+    stop(
+      "unreasonable deployment period (must be > 0 and < 180 d) for sample(s): ",
+      paste0(sample_id[bad], " (", deployment_days[bad], " d)", collapse = ", ")
     )
+  }
 
 }

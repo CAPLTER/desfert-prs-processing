@@ -1,26 +1,15 @@
 #' @title confirm that all samples are included in the formatted data
 #'
-#' @description `validate_wal_ids` checks that the `WAL #` ids in the
-#' imported data are also included in the formatted data.
-#'
-#' @note Owing to the unfriendly column naming that WesternAg uses, this
-#' function employs indexing to isolate the `WAL #` column(s) in the
-#' uploaded and formatted data.
+#' @description `validate_wal_ids` checks that the WAL ids in the imported
+#' samples are the same as those in the formatted data, i.e., that no samples
+#' were inappropriately filtered or otherwise excluded. Stops on failure.
 #'
 #' @export
 
-validate_wal_ids <- function(imported_prs_data, formatted_prs_data) {
+validate_wal_ids <- function(imported_wal_ids, formatted_wal_ids) {
 
-  wal_ids_upload <- suppressWarnings(as.integer(imported_prs_data[[1]]))
-  wal_ids_upload <- sort(wal_ids_upload[!is.na(wal_ids_upload)])
-
-  wal_ids_format <- suppressWarnings(as.integer(formatted_prs_data[[1]]))
-  wal_ids_format <- sort(unique(wal_ids_format))
-
-  if (!identical(wal_ids_upload, wal_ids_format)) {
-
+  if (!identical(sort(unique(imported_wal_ids)), sort(unique(formatted_wal_ids)))) {
     stop("wal ids of imported and formatted data do not match")
-
   }
 
 }

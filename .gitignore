@@ -1,2 +1,3 @@
 local_settings.R
 .Rhistory
+*.xlsx
